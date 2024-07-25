@@ -1,60 +1,58 @@
 import pickle
 import streamlit as st
 
-# Fungsi untuk memuat model dari file
-def load_model(filename):
-    with open(filename, 'rb') as file:
-        svm_model = pickle.load(file)
-    return svm_model
+# Membaca model
+try:
+    with open('resto_model.sav', 'rb') as file:
+       resto_model = pickle.load(file)
+except FileNotFoundError:
+    st.error("File model tidak ditemukan. Pastikan file berada di jalur yang benar.")
+except Exception as e:
+    st.error(f"Error saat memuat model: {e}")
 
-# Muat model Random Forest yang telah disimpan
-model_filename = 'resto_model.sav'
-svm_model = load_model(model_filename)
-
-# Fungsi untuk melakukan prediksi dan menentukan kategori profitabilitas
-def predict_profitability(features):
-    # Melakukan prediksi dengan model
-    profitability_prediction = svm_model.predict([features])
-    
-    # Menentukan kategori profitabilitas berdasarkan prediksi
-    if profitability_prediction[0] == 0:
-        profitability_category = 'low'
-    elif profitability_prediction[0] == 1:
-        profitability_category = 'medium'
-    else:
-        profitability_category = 'high'
-    
-    return profitability_category
-
-# Judul web
-st.title('Prediksi Profitabilitas Menu Restoran')
-
-# Input data dengan contoh angka valid untuk pengujian
-menu_item = st.number_input('Menu Item', min_value=0)
-menu_category = st.number_input('Menu Category', min_value=0)
-ingredients = st.number_input('Ingredients', min_value=0)
-price = st.number_input('Price', min_value=0)
-
-# Inisialisasi variabel untuk prediksi
-profitability_prediction = ''
-
-# Membuat tombol untuk prediksi
-if st.button('Prediksi'):
+# Function to validate if the input is an integer
+def is_valid_integer(value):
     try:
-        # Convert input to appropriate data types
-        menu_item = int(menu_item)
-        menu_category = int(menu_category)
-        ingredients = int(ingredients)
-        price = int(price)
-
-        # Melakukan prediksi
-        profitability_prediction = predict_profitability([menu_item, menu_category, ingredients, price])
-
-        # Menentukan kategori profitabilitas berdasarkan prediksi
-        st.success(f'Profitabilitas: {profitability_prediction}')
-
+        int(value)
+        return True
     except ValueError:
-        st.error("Pastikan semua input diisi dengan angka yang valid.")
-    except Exception as e:
-        st.error(f"Terjadi kesalahan: {e}")
+        return False
+
+# Function to simulate prediction logic
+def predict(Menu_Item, Menu_Category, Ingredients, Price):
+    # Placeholder logic for prediction
+    # You can replace this with actual model prediction logic
+    if int(Price) > 50:
+        return 1  # success
+    else:
+        return 0  # failed
+
+# Title of the application
+st.title("Prediksi Profitabilitas Menu Restoran")
+
+# Form for user input
+with st.form(key='profit_form'):
+    Menu_Item = st.text_input("Menu Item")
+    Menu_Category = st.text_input("Menu Category")
+    Ingredients = st.text_input("Ingredients")
+    Price = st.text_input("Price")
+
+    # Submit button for the form
+    submit_button = st.form_submit_button(label='Prediksi')
+
+# Validation and prediction logic after form submission
+if submit_button:
+    if (is_valid_integer(Menu_Item) and is_valid_integer(Menu_Category) and is_valid_integer(Ingredients) and is_valid_integer(Price)):
         
+        st.success("All inputs are valid integers.")
+        
+        # Perform prediction
+        prediction = predict(Menu_Item, Menu_Category, Ingredients, Price)
+        
+        # Display prediction result
+        if prediction == 1:
+            st.success("Predicted Profit: Success (1)")
+        else:
+            st.error("Predicted Profit: Failed (0)")
+    else:
+        st.error("Please enter valid integer values.")

@@ -4,3 +4,4 @@ pickle
 streamlit
 scikit-learn
 pip==24.0
+sklearn

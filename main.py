@@ -1,6 +1,8 @@
+import streamlit as st
 
 import pickle
-import streamlit as st
+from sklearn.ensemble import RandomForestClassifier  # Ensure the module is imported
+from sklearn.svm import SVC
 
 # Fungsi untuk memuat model dari file
 def load_model(filename):
@@ -31,10 +33,10 @@ def predict_profitability(features):
 st.title('Prediksi Profitabilitas Menu Restoran')
 
 # Input data dengan contoh angka valid untuk pengujian
-menu_item = st.number_input('Menu Item', min_value=0)
-menu_category = st.number_input('Menu Category', min_value=0)
-ingredients = st.number_input('Ingredients', min_value=0)
-price = st.number_input('Price', min_value=0)
+menu_item = st.number_input('Menu Item (Encoded)', min_value=0)
+menu_category = st.number_input('Menu Category (Encoded)', min_value=0)
+ingredients = st.number_input('Ingredients (Encoded)', min_value=0)
+price = st.number_input('Price (Encoded and Standardized)', min_value=-3.0, max_value=3.0, step=0.01)
 
 # Inisialisasi variabel untuk prediksi
 profitability_prediction = ''
@@ -46,7 +48,7 @@ if st.button('Prediksi'):
         menu_item = int(menu_item)
         menu_category = int(menu_category)
         ingredients = int(ingredients)
-        price = int(price)
+        price = float(price)
 
         # Melakukan prediksi
         profitability_prediction = predict_profitability([menu_item, menu_category, ingredients, price])
@@ -58,4 +60,3 @@ if st.button('Prediksi'):
         st.error("Pastikan semua input diisi dengan angka yang valid.")
     except Exception as e:
         st.error(f"Terjadi kesalahan: {e}")
-        
